@@ -65,7 +65,6 @@ RabbitMQ是一个用于接收、存储、转发消息的代理(broker)。
     `#` 匹配零个到多个单词
 
 * HEADERS
-
 没看这个😄
 
 ### routing key
