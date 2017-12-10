@@ -13,7 +13,7 @@ RabbitMQ是一个用于接收、存储、转发消息的代理(broker)。
 
 ### 远程访问
 
-默认用户只能本地访问，故需要添加新用户
+默认guest用户只能本地访问，故需要添加新用户
 
     rabbitmqctl add_user admin admin #添加用户admin，密码admin
     rabbitmqctl set_user_tags admin administrator #设置用户角色
@@ -101,15 +101,19 @@ RabbitMQ怎样避免消息丢失？
 
 发布确认，broker会在接收到消息并正确处理后给客户端发送ack消息，不可与事务混合使用。
 消息何时被确认？
+
 * 对于无路由的消息，broker会在Exchange确认该消息不会被路由到任何Queue时发送basic.ack回客户端进行确认。
-如果客户端发送消息使用了mandatory参数，则先发送basic.return再发送basic.ack回客户端进行确认。
+
+    如果客户端发送消息使用了mandatory参数，则先发送basic.return再发送basic.ack回客户端进行确认。
+    可以在channel添加ReturnListener来接收broker返回的无路由的消息做相应的处理。
+    
 * 对于可路由的消息，当所有Queue已接收到消息后，broker发送basic.ack回客户端进行确认。
-* 对于要发送到durable queue的消息，消息持久化到磁盘后broker发送确认。
-* 对于mirrored queues，所有队列都接收该消息后broker发送确认。
+    对于要发送到durable queue的消息，消息持久化到磁盘后broker发送确认。
+    对于mirrored queues，所有队列都接收该消息后broker发送确认。
 
 ### 消费者
 
-对于消费者，设置autoAck为false，只有当消息消费成功才发送ack；若消费失败，则发送nack，使消息重回Queue
+对于消费者，设置autoAck为false，只有当消息处理成功才发送ack；若消费失败，则发送nack（注意requeue参数）
 
 ## 完
 
