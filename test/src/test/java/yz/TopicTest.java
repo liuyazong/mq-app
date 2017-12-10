@@ -31,8 +31,10 @@ public class TopicTest {
     @Before
     public void init() {
         connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("127.0.0.1");
+        connectionFactory.setHost("192.168.1.37");
         connectionFactory.setPort(5672);
+        connectionFactory.setUsername("admin");
+        connectionFactory.setPassword("admin");
         serializer = new SerializerImpl();
         deSerializer = new DeSerializerImpl();
         producerFactory = new RabbitProducerFactory(connectionFactory, serializer);

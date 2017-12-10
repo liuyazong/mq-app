@@ -64,7 +64,7 @@ public abstract class AbsProducer implements Producer {
                     .deliveryMode(2)
                     .priority(0)
                     .build();
-            channel.basicPublish(getExchange(), getRoutingKey(), props, serializer.serialize(aMessage));
+            channel.basicPublish(getExchange(), getRoutingKey(), true, props, serializer.serialize(aMessage));
         }
     }
 

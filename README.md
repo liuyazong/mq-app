@@ -2,12 +2,12 @@
 
 RabbitMQ是一个开源的AMQP(高级消息队列协议)实现，服务器端用Erlang语言编写，支持多种客户端，如Java、Python等。
 
-RabbitMQ是一个用于接收、存储、转发消息的代理。
+RabbitMQ是一个用于接收、存储、转发消息的代理(broker)。
 
 ## 部署
 ### 下载
 
-[Erlang下载]()
+[Erlang下载](http://www.erlang.org/downloads)
 
 [RabbitMQ下载](https://www.rabbitmq.com/download.html)
 
@@ -46,11 +46,72 @@ RabbitMQ是一个用于接收、存储、转发消息的代理。
 
 消息路由，根据routingKey和Exchange类型将消息发送到不同的Queue
 
+
+### Exchange Type
+
+有4种内建类型(`com.rabbitmq.client.BuiltinExchangeType`)
+
+    DIRECT("direct"), FANOUT("fanout"), TOPIC("topic"), HEADERS("headers");
+    
+* DIRECT
+生产者routing key与消费者routing key完全匹配的模式
+* FANOUT
+忽略routing key，即将消息发送到所有绑定到该Exchange的Queue
+* TOPIC
+将生产者routing key与消费者routing key进行模糊匹配：
+
+    `*` 仅匹配一个单词
+    
+    `#` 匹配零个到多个单词
+
+* HEADERS
+
+没看这个😄
+
 ### routing key
 
-生产者发送消息到Exchange时，需要一个routing key并配合Exchange类型来配置消息路由规则，即指定消息流向哪里或者被丢弃。
+routing key是一个以`.`分割的字符串。
+生产者发送消息到Exchange时，需要一个routing key并配合Exchange类型来配置消息路由规则，即指定消息流向哪里。
 routing key的长度最大为255bytes。
  
-消费者消费消息时，也需要 
+同生产者，消费者消费消息时，也需要一个routing key(或者叫binding key)，来绑定Queue到Exchange。
+
+当生产者routing key与消费者routing key根据Exchange Type能匹配到时，消息将会被路由到消费者所绑定的Queue中。
+
+## Api
+
+    com.rabbitmq.client.ConnectionFactory
+    com.rabbitmq.client.Connection
+    com.rabbitmq.client.Channel
+
 ## 示例
+
+[看代码](https://github.com/liuyazong/mq-app)
+
 ## 消息可靠投递
+
+RabbitMQ怎样避免消息丢失？
+
+### 生产者
+
+#### 事务
+
+据说性能不好，暂时无视
+
+#### Publisher Confirms
+
+生产者发布确认，不可与事务混合使用。
+消息何时被确认？
+* 对于无路由的消息，broker会在Exchange确认该消息不会被路由到任何Queue时发送basic.ack回客户端进行确认。
+如果客户端发送消息使用了mandatory参数，则先发送basic.return再发送basic.ack回客户端进行确认。
+* 对于可路由的消息，当所有Queue已接收到消息后，broker发送basic.ack回客户端进行确认。
+* 对于要发送到durable queue的消息，消息持久化到磁盘后broker发送确认。
+* 对于mirrored queues，所有队列都接收该消息后broker发送确认。
+
+### 消费者
+
+对于消费者，设置autoAck为false，只有当消息消费成功才发送ack；若消费失败，则发送nack，使消息重回Queue
+
+## 完
+
+[代码](https://github.com/liuyazong/mq-app)

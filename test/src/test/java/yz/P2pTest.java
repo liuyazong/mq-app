@@ -34,8 +34,10 @@ public class P2pTest {
     @Before
     public void init() {
         connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("127.0.0.1");
+        connectionFactory.setHost("192.168.1.37");
         connectionFactory.setPort(5672);
+        connectionFactory.setUsername("admin");
+        connectionFactory.setPassword("admin");
         serializer = new SerializerImpl();
         deSerializer = new DeSerializerImpl();
         producerFactory = new RabbitProducerFactory(connectionFactory, serializer);
@@ -49,7 +51,7 @@ public class P2pTest {
         int nThreads = Runtime.getRuntime().availableProcessors() << 1;
         ExecutorService pool = Executors.newFixedThreadPool(nThreads);
         CountDownLatch latch = new CountDownLatch(nThreads);
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < nThreads; i++) {
             pool.execute(() -> {
                 try {
                     producer.send(new Message());
@@ -59,6 +61,7 @@ public class P2pTest {
                 }
             });
         }
+        Thread.currentThread().join();
         latch.await();
         pool.shutdown();
     }
