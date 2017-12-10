@@ -99,7 +99,7 @@ RabbitMQ怎样避免消息丢失？
 
 #### Publisher Confirms
 
-生产者发布确认，不可与事务混合使用。
+发布确认，broker会在接收到消息并正确处理后给客户端发送ack消息，不可与事务混合使用。
 消息何时被确认？
 * 对于无路由的消息，broker会在Exchange确认该消息不会被路由到任何Queue时发送basic.ack回客户端进行确认。
 如果客户端发送消息使用了mandatory参数，则先发送basic.return再发送basic.ack回客户端进行确认。
