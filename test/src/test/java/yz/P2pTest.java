@@ -61,7 +61,6 @@ public class P2pTest {
                 }
             });
         }
-        Thread.currentThread().join();
         latch.await();
         pool.shutdown();
     }
