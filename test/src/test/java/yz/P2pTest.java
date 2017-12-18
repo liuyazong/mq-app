@@ -34,7 +34,7 @@ public class P2pTest {
     @Before
     public void init() {
         connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("192.168.1.37");
+        connectionFactory.setHost("127.0.0.1");
         connectionFactory.setPort(5672);
         connectionFactory.setUsername("admin");
         connectionFactory.setPassword("admin");
@@ -47,14 +47,14 @@ public class P2pTest {
 
     @Test
     public void send() throws Exception {
-        Producer producer = producerFactory.createP2pProducer("hello");//new P2PProducerImpl (connection, "hello",serializer);
         int nThreads = Runtime.getRuntime().availableProcessors() << 1;
         ExecutorService pool = Executors.newFixedThreadPool(nThreads);
         CountDownLatch latch = new CountDownLatch(nThreads);
         for (int i = 0; i < nThreads; i++) {
             pool.execute(() -> {
                 try {
-                    producer.send(new Message());
+                    Producer producer = producerFactory.createP2pProducer("hello");//new P2PProducerImpl (connection, "hello",serializer);
+                    producer.send(new Message(),new Message());
                     latch.countDown();
                 } catch (Exception e) {
                     e.printStackTrace();
