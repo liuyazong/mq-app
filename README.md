@@ -1,4 +1,3 @@
-# RabbitMQ
 
 RabbitMQ是一个开源的AMQP(高级消息队列协议)实现，服务器端用Erlang语言编写，支持多种客户端，如Java、Python等。
 
